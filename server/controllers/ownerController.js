@@ -225,8 +225,7 @@ export const updateUserImage = async (req, res) => {
       throw new Error("Image upload failed: no URL returned from ImageKit");
     }  
     const image = response.url;
-    await User.findByIdAnd
-Update(_id, { image });
+    await User.findByIdAndUpdate(_id, { image });
 
     res.json({
       success: true,
