@@ -18,9 +18,6 @@ export const changeRoleToOwner=async(req,res)=>{
 };
 
 //api to list Car
-
-
-
 export const addCar = async (req, res) => {
   try {
     const { _id } = req.user;
@@ -105,7 +102,6 @@ export const toggleCarAvailability=async(req,res)=>{
         res.json({success:true, message:error.message})
     }
 }
-
 
 //Api to Delete a Car 
 export const deleteCar=async(req,res)=>{
@@ -207,35 +203,33 @@ export const updateUserImage = async (req, res) => {
       });
     }
 
-    // ✅ If using diskStorage
-    // const fileBuffer = fs.readFileSync(imageFile.path);
-
-    // ✅ If using memoryStorage
     const fileBuffer = imageFile.buffer;
 
-    // Upload image to ImageKit
     const response = await imagekit.upload({
       file: fileBuffer,
       fileName: imageFile.originalname,
       folder: "/users",
     });
 
-    // ✅ Use response.url instead of response.filePath
     if (!response || !response.url) {
       throw new Error("Image upload failed: no URL returned from ImageKit");
-    }  
+    }
+
     const image = response.url;
-    await User.findByIdAndUpdate(_id, { image });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { image },
+      { new: true, runValidators: true }
+    );
 
     res.json({
       success: true,
       message: "Profile image updated",
-      image,
+      image: updatedUser.image,
     });
-  }
-    catch (error) {
-
-    console.log("Update image error:", error.message);
+  } catch (error) {
+    console.error("Update image error:", error.message);
     res.status(500).json({
       success: false,
       message: error.message || "Something went wrong while updating the image.",
